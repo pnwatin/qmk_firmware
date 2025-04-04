@@ -62,6 +62,9 @@ enum tap_dances {
 // TAP DANCES
 #define ARROWS TD(TD_ARROWS)
 
+// THUMBROW
+#define TRM_ENT MEH_T(KC_ENT)
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [BASE] = LAYOUT_split_3x6_3(
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
@@ -71,7 +74,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX,   HRM_Z,    KC_X,    KC_C,   HRM_D,    KC_V,                         KC_K,   HRM_H, KC_COMM, HRM_DOT, HRM_UND, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                           XXXXXXX,  KC_ESC,  KC_SPC,     KC_ENT, KC_BSPC, XXXXXXX
+                                           XXXXXXX,  KC_ESC,  KC_SPC,    TRM_ENT, KC_BSPC, XXXXXXX
                                        //`--------------------------'  `--------------------------'
    ),
   [NUM] = LAYOUT_split_3x6_3(
@@ -171,8 +174,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         &sw_lang_active, MOD_MASK_CTRL | MOD_MASK_ALT, KC_SPC, SW_LANG,
         keycode, record
     );
-
-    // if (!process_custom_shift_keys(keycode, record)) { return false; }
 
     switch (keycode) {
         case HRM_UND:
