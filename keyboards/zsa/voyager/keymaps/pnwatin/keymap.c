@@ -75,11 +75,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_HOME, KC_PGDN, KC_PGUP,  KC_END, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_LCTL, KC_LGUI, KC_LSFT, _______, XXXXXXX,                      KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,  SW_WIN, XXXXXXX,
+       XXXXXXX, KC_LCTL, KC_LGUI, KC_LSFT, _______, XXXXXXX,                      KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     LEFT_TAB,  KC_ESC, CW_TOGG,RGHT_TAB, XXXXXXX, XXXXXXX,
+       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     LEFT_TAB,  KC_TAB, CW_TOGG,RGHT_TAB, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                                    _______, _______,     KC_TAB, _______
+                                                    _______, _______,     SW_WIN, _______
                                                  //`----------------'  `------------------'
    ),
   [LSYM] = LAYOUT(
