@@ -28,7 +28,7 @@ enum custom_keycodes {
 #define HRM_I RCTL_T(KC_I)
 
 // BOTTOMROW
-#define HRM_Q LALT_T(KC_Q)
+#define HRM_X LALT_T(KC_X)
 #define HRM_W LGUI_T(KC_W)
 
 #define HRM_F LGUI_T(KC_F)
@@ -47,11 +47,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX,    KC_B,    KC_L,    KC_D,    KC_C,    KC_V,                         KC_Z,    KC_Y,    KC_O,    KC_U, KC_QUOT, XXXXXXX,
+       XXXXXXX,    KC_B,    KC_L,    KC_D,    KC_C,    KC_V,                         KC_J,    KC_Y,    KC_O,    KC_U, KC_QUOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_P,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,   HRM_Q,    KC_X,    KC_M,   HRM_W,    KC_J,                         KC_K,   HRM_F, KC_COMM,  KC_DOT, HRM_UND, XXXXXXX,
+       XXXXXXX,   HRM_X,    KC_Q,    KC_M,   HRM_W,    KC_Z,                         KC_K,   HRM_F, KC_COMM,  KC_DOT, HRM_UND, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                      KC_SPC,  KC_ESC,    HRM_ENT, KC_BSPC
                                                  //`----------------'  `------------------'
