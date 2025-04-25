@@ -28,11 +28,11 @@ enum custom_keycodes {
 #define HRM_I RCTL_T(KC_I)
 
 // BOTTOMROW
-#define HRM_X LALT_T(KC_X)
+#define HRM_Q LALT_T(KC_Q)
 #define HRM_W LGUI_T(KC_W)
 
 #define HRM_F LGUI_T(KC_F)
-#define HRM_UND LALT_T(KC_F23)
+#define HRM_DOT LALT_T(KC_DOT)
 
 // THUMBROW
 #define HRM_ENT LT(META, KC_ENT)
@@ -51,7 +51,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_P,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,   HRM_X,    KC_Q,    KC_M,   HRM_W,    KC_Z,                         KC_K,   HRM_F, KC_COMM,  KC_DOT, HRM_UND, XXXXXXX,
+       XXXXXXX,   HRM_Q,    KC_X,    KC_M,   HRM_W,    KC_Z,                         KC_K,   HRM_F, KC_COMM, KC_UNDS, HRM_DOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                      KC_SPC,  KC_ESC,    HRM_ENT, KC_BSPC
                                                  //`----------------'  `------------------'
@@ -64,7 +64,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX, KC_MINS,    KC_1,    KC_2,    KC_3, KC_PLUS,                      XXXXXXX, _______, KC_RSFT, KC_RGUI, KC_RCTL, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,    KC_X,    KC_4,    KC_5,    KC_6, KC_PERC,                      XXXXXXX, XXXXXXX, KC_COMM,  KC_DOT, KC_LALT, XXXXXXX,
+       XXXXXXX,    KC_X,    KC_4,    KC_5,    KC_6, KC_PERC,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_LALT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                        KC_0, _______,    _______, _______
                                                  //`----------------'  `------------------'
@@ -99,11 +99,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_CIRC, KC_RCBR, KC_LCBR,  KC_DLR,  KC_GRV, XXXXXXX,
+       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_CIRC, KC_RCBR, KC_LCBR,  KC_DLR, KC_COMM, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX, KC_LCTL, _______, KC_LSFT, XXXXXXX, XXXXXXX,                      KC_HASH, KC_RPRN, KC_LPRN,  ARROWS, KC_SCLN, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, KC_LGUI, XXXXXXX,                      KC_BSLS, KC_COLN, KC_COMM,  KC_DOT, KC_UNDS, XXXXXXX,
+       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, KC_LGUI, XXXXXXX,                      KC_BSLS, KC_COLN,  KC_GRV, KC_UNDS,  KC_DOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     _______, _______,    _______, _______
                                                  //`----------------'  `------------------'
@@ -137,11 +137,12 @@ combo_t key_combos[] = {
 // CUSTOM SHIFT
 const custom_shift_key_t custom_shift_keys[] = {
     {KC_DOT, KC_QUES},
+    {HRM_DOT, KC_QUES},
     {KC_COMM, KC_EXLM},
     {KC_UNDS, KC_AT},
-    {HRM_UND, KC_AT},
     {KC_BSPC, KC_DEL},
     {KC_SLSH, KC_BSLS},
+    {KC_SPC, KC_TAB},
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -155,12 +156,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     );
 
     switch (keycode) {
-        case HRM_UND:
-            if (record->event.pressed && record->tap.count > 0) {
-                tap_code16(KC_UNDS);
-                return false;
-            }
-            break;
+        // case HRM_UND:
+        //     if (record->event.pressed && record->tap.count > 0) {
+        //         tap_code16(KC_UNDS);
+        //         return false;
+        //     }
+        //     break;
 
         case ARROWS:
             if (record->event.pressed) {
