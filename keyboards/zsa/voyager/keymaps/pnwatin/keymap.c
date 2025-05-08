@@ -28,14 +28,14 @@ enum custom_keycodes {
 #define HRM_I RCTL_T(KC_I)
 
 // BOTTOMROW
-#define HRM_Q LALT_T(KC_Q)
-#define HRM_W LGUI_T(KC_W)
 
-#define HRM_F LGUI_T(KC_F)
-#define HRM_DOT LALT_T(KC_DOT)
+#define HRM_Z LALT_T(KC_Z)
+#define HRM_C LGUI_T(KC_C)
+
+#define HRM_P RGUI_T(KC_P)
+#define HRM_UND LALT_T(KC_F23)
 
 // THUMBROW
-#define HRM_ENT LT(META, KC_ENT)
 
 // TABS
 #define RGHT_TAB C(KC_TAB)
@@ -47,13 +47,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX,    KC_B,    KC_L,    KC_D,    KC_C,    KC_V,                         KC_J,    KC_Y,    KC_O,    KC_U, KC_QUOT, XXXXXXX,
+       XXXXXXX,    KC_Q,    KC_L,    KC_D,    KC_W,    KC_B,                         KC_J,    KC_F,    KC_O,    KC_U, KC_QUOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_P,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
+       XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_Y,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,   HRM_Q,    KC_X,    KC_M,   HRM_W,    KC_Z,                         KC_K,   HRM_F, KC_COMM, KC_UNDS, HRM_DOT, XXXXXXX,
+       XXXXXXX,   HRM_Z,    KC_X,    KC_M,   HRM_C,    KC_V,                         KC_K,   HRM_P, KC_COMM,  KC_DOT, HRM_UND, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                                     KC_SPC,  KC_ESC,    HRM_ENT, KC_BSPC
+                                                     KC_SPC,  KC_ESC,     KC_ENT, KC_BSPC
                                                  //`----------------'  `------------------'
     ),
   [NUM] = LAYOUT(
@@ -99,11 +99,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_CIRC, KC_RCBR, KC_LCBR,  KC_DLR, KC_COMM, XXXXXXX,
+       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_CIRC, KC_RCBR, KC_LCBR,  KC_DLR,  KC_GRV, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX, KC_LCTL, _______, KC_LSFT, XXXXXXX, XXXXXXX,                      KC_HASH, KC_RPRN, KC_LPRN,  ARROWS, KC_SCLN, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, KC_LGUI, XXXXXXX,                      KC_BSLS, KC_COLN,  KC_GRV, KC_UNDS,  KC_DOT, XXXXXXX,
+       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, KC_LGUI, XXXXXXX,                      KC_BSLS, KC_COLN, KC_QUES, KC_EXLM, KC_UNDS, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     _______, _______,    _______, _______
                                                  //`----------------'  `------------------'
@@ -129,17 +129,19 @@ bool sw_lang_active = false;
 
 // COMBOS
 const uint16_t capsword[] PROGMEM = {KC_M, KC_COMM, COMBO_END};
+const uint16_t meta[] PROGMEM = {KC_COMM, KC_DOT, COMBO_END};
 
 combo_t key_combos[] = {
     COMBO(capsword, CW_TOGG),
+    COMBO(meta, MO(META))
 };
 
 // CUSTOM SHIFT
 const custom_shift_key_t custom_shift_keys[] = {
     {KC_DOT, KC_QUES},
-    {HRM_DOT, KC_QUES},
     {KC_COMM, KC_EXLM},
     {KC_UNDS, KC_AT},
+    {HRM_UND, KC_AT},
     {KC_BSPC, KC_DEL},
     {KC_SLSH, KC_BSLS},
     {KC_SPC, KC_TAB},
@@ -156,12 +158,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     );
 
     switch (keycode) {
-        // case HRM_UND:
-        //     if (record->event.pressed && record->tap.count > 0) {
-        //         tap_code16(KC_UNDS);
-        //         return false;
-        //     }
-        //     break;
+        case HRM_UND:
+            if (record->event.pressed && record->tap.count > 0) {
+                tap_code16(KC_UNDS);
+                return false;
+            }
+            break;
 
         case ARROWS:
             if (record->event.pressed) {
