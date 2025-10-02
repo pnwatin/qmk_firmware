@@ -2,12 +2,10 @@ CAPS_WORD_ENABLE = yes
 COMBO_ENABLE = yes
 LAYER_LOCK_ENABLE = yes
 SEND_STRING_ENABLE = yes
-TAP_DANCE_ENABLE = no
-# RGBLIGHT_ENABLE = no
-# RGB_MATRIX_ENABLE = no
 
 SRC += features/swapper.c
 
+TAP_DANCE_ENABLE = no
 # optimisations
 LTO_ENABLE = yes
 CONSOLE_ENABLE = no

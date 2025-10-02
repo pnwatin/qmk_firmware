@@ -1,6 +1,10 @@
 #include QMK_KEYBOARD_H
 #include "features/swapper.h"
 
+#ifdef CONSOLE_ENABLE
+#include "print.h"
+#endif
+
 enum layers {
   BASE,
   NUM,
@@ -33,7 +37,7 @@ enum custom_keycodes {
 #define HRM_C LGUI_T(KC_C)
 
 #define HRM_P RGUI_T(KC_P)
-#define HRM_UND LALT_T(KC_F23)
+#define HRM_DOT LALT_T(KC_DOT)
 
 // THUMBROW
 #define HRM_ESC RALT_T(KC_ESC)
@@ -48,15 +52,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX,    KC_Q,    KC_L,    KC_D,    KC_W,    KC_B,                         KC_J,    KC_F,    KC_O,    KC_U, KC_QUOT, XXXXXXX,
+       XXXXXXX,    KC_Q,    KC_L,    KC_D,    KC_W,    KC_B,                         KC_J,    KC_F,    KC_O,    KC_U, KC_COMM, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_Y,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,   HRM_Z,    KC_X,    KC_M,   HRM_C,    KC_V,                         KC_K,   HRM_P, KC_COMM,  KC_DOT, HRM_UND, XXXXXXX,
+       XXXXXXX,   HRM_Z,    KC_X,    KC_M,   HRM_C,    KC_V,                         KC_K,   HRM_P, KC_QUOT, KC_UNDS, HRM_DOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                      KC_SPC, HRM_ESC,     KC_ENT, KC_BSPC
                                                  //`----------------'  `------------------'
-    ),
+  ),
   [NUM] = LAYOUT(
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
@@ -104,7 +108,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX, KC_LCTL, _______, KC_LSFT, XXXXXXX, XXXXXXX,                      KC_HASH, KC_RPRN, KC_LPRN,  ARROWS, KC_SCLN, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, KC_LGUI, XXXXXXX,                      KC_BSLS, KC_COLN, KC_QUES, KC_EXLM, KC_UNDS, XXXXXXX,
+       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, KC_LGUI, XXXXXXX,                      KC_BSLS, KC_COLN, KC_DQUO, KC_UNDS,  KC_DOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     _______, _______,    _______, _______
                                                  //`----------------'  `------------------'
@@ -129,8 +133,8 @@ bool sw_win_active = false;
 bool sw_lang_active = false;
 
 // COMBOS
-const uint16_t capsword[] PROGMEM = {KC_M, KC_COMM, COMBO_END};
-const uint16_t meta[] PROGMEM = {KC_COMM, KC_DOT, COMBO_END};
+const uint16_t capsword[] PROGMEM = {KC_M, KC_QUOT, COMBO_END};
+const uint16_t meta[] PROGMEM = {KC_QUOT, KC_UNDS, COMBO_END};
 
 combo_t key_combos[] = {
     COMBO(capsword, CW_TOGG),
@@ -140,14 +144,30 @@ combo_t key_combos[] = {
 // CUSTOM SHIFT
 const custom_shift_key_t custom_shift_keys[] = {
     {KC_DOT, KC_QUES},
+    {HRM_DOT, KC_QUES},
     {KC_COMM, KC_EXLM},
     {KC_UNDS, KC_AT},
-    {HRM_UND, KC_AT},
+    {KC_SPC, KC_TAB},
     {KC_BSPC, KC_DEL},
     {KC_SLSH, KC_BSLS},
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+#ifdef CONSOLE_ENABLE
+    // If you use combos, you can special-case them; otherwise keep it simple:
+    uint8_t row = record->event.key.row;
+    uint8_t col = record->event.key.col;
+
+    uprintf("0x%04X,%u,%u,%u,%u,0x%02X,0x%02X,%u\n",
+            keycode,                             // 0x#### (hex keycode)
+            row,                                 // row
+            col,                                 // col
+            get_highest_layer(layer_state),      // layer
+            record->event.pressed ? 1 : 0,       // pressed (0/1)  <-- was %b
+            (unsigned)get_mods(),                // current mods (hex)
+            (unsigned)get_oneshot_mods(),        // oneshot mods (hex)
+            record->tap.count);                  // tap count
+#endif
     update_swapper(
         &sw_win_active, MOD_MASK_GUI, KC_TAB, SW_WIN,
         keycode, record
@@ -158,12 +178,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     );
 
     switch (keycode) {
-        case HRM_UND:
-            if (record->event.pressed && record->tap.count > 0) {
-                tap_code16(KC_UNDS);
-                return false;
-            }
-            break;
 
         case ARROWS:
             if (record->event.pressed) {
