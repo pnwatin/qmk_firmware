@@ -1,13 +1,17 @@
 CONVERT_TO = rp2040_ce
 
+# this board has no per-key LEDs and no OLEDs
+RGB_MATRIX_ENABLE = no
+OLED_ENABLE = no
+
 CAPS_WORD_ENABLE = yes
 COMBO_ENABLE = yes
 LAYER_LOCK_ENABLE = yes
 SEND_STRING_ENABLE = yes
-TAP_DANCE_ENABLE = no
 
 SRC += features/swapper.c
 
+TAP_DANCE_ENABLE = no
 # optimisations
 LTO_ENABLE = yes
 CONSOLE_ENABLE = no
