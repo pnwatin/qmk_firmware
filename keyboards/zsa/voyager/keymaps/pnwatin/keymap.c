@@ -1,63 +1,53 @@
 #include QMK_KEYBOARD_H
 #include "features/swapper.h"
 
-// SYM_L and SYM_R are two *identical* symbol layers. Keeping them separate
-// avoids the layer_off() race of two LT() keys sharing one layer, and lets the
-// pair compose into NUM through update_tri_layer_state().
 enum layers {
-    BASE,
-    NAV,
-    SYM_L,
-    SYM_R,
-    NUM,
-    META,
+  BASE,
+  NUM,
+  NAV,
+  LSYM,
+  RSYM,
+  META
 };
 
 enum custom_keycodes {
-    SW_WIN = SAFE_RANGE,
-    SW_LANG,
-    ARROWS,
-    NW_TOGG,
+  SW_WIN = SAFE_RANGE,
+  SW_LANG,
+  ARROWS,
 };
 
-// -----------------------------------------------------------------------------
-// Base-layer home-row mods. Keep the same modifier on the same finger on both
-// HRM-v2 variants so that the only A/B variable is Flow Tap.
-// -----------------------------------------------------------------------------
+// HOMEROW
 #define HRM_N LCTL_T(KC_N)
-#define HRM_R LALT_T(KC_R)
+#define HRM_R LT(RSYM, KC_R)
 #define HRM_T LGUI_T(KC_T)
 #define HRM_S LSFT_T(KC_S)
 
 #define HRM_H RSFT_T(KC_H)
 #define HRM_A RGUI_T(KC_A)
-#define HRM_E RALT_T(KC_E)
+#define HRM_E LT(LSYM, KC_E)
 #define HRM_I RCTL_T(KC_I)
 
-// -----------------------------------------------------------------------------
-// Thumbs:
-//   left:  Space/Nav, Esc/SymL
-//   right: Enter/SymR, Magic Shift
-//
-// Symbols get two access keys because they are a second alphabet in Rust/TS.
-// Numbers are the chord of the two: hold both inner thumbs -> NUM.
-// -----------------------------------------------------------------------------
-#define TH_SPC LT(NAV, KC_SPC)
-#define TH_LSYM LT(SYM_L, KC_ESC)
-#define MGIC_SFT LSFT_T(KC_NO)
-#define TH_RSYM LT(SYM_R, KC_ENT)
+#define HRM_Z LALT_T(KC_Z)
+#define HRM_DOT LALT_T(KC_DOT)
 
+// THUMBROW
+#define HRM_SPC LT(NAV, KC_SPC)
+#define HRM_ESC RALT_T(KC_ESC)
+#define HRM_ENT RSFT_T(KC_ENT)
+#define HRM_BSP LT(NUM, KC_BSPC)
 
-// -----------------------------------------------------------------------------
-// Browser/tab shortcuts
-// -----------------------------------------------------------------------------
+// TABS
 #define RGHT_TAB C(KC_TAB)
 #define LEFT_TAB C(S(KC_TAB))
+#define SFT_TAB S(KC_TAB)
 
-// -----------------------------------------------------------------------------
-// Explicit handedness removes any dependency on QMK guessing the Voyager
-// matrix geometry. Thumbs are '*': Chordal Hold does not constrain them.
-// -----------------------------------------------------------------------------
+// CHORDAL HOLD
+// Explicit handedness removes any dependency on QMK guessing the Voyager matrix
+// geometry. Thumbs are '*', which is what the old get_chordal_hold() override
+// did by hand: Chordal Hold does not constrain them.
+// This is the main guard for HRM_R/HRM_E: LSYM/RSYM live on the opposite hand,
+// so a same-hand roll off `r` or `e` is forced to a tap and can never open a
+// symbol layer mid-word.
 const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM = LAYOUT(
     'L','L','L','L','L','L',                         'R','R','R','R','R','R',
     'L','L','L','L','L','L',                         'R','R','R','R','R','R',
@@ -75,65 +65,59 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_Y,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,    KC_Z,    KC_X,    KC_M,    KC_C,    KC_V,                         KC_K,    KC_P, KC_QUOT, KC_UNDS,  KC_DOT, XXXXXXX,
+       XXXXXXX,   HRM_Z,    KC_X,    KC_M,    KC_C,    KC_V,                         KC_K,    KC_P, KC_QUOT, KC_UNDS, HRM_DOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                                     TH_SPC, TH_LSYM,    TH_RSYM, MGIC_SFT
+                                                    HRM_SPC, HRM_ESC,    HRM_ENT, HRM_BSP
                                                  //`----------------'  `------------------'
   ),
+  [NUM] = LAYOUT(
+   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
+       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+   //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
+       XXXXXXX, XXXXXXX,    KC_9,    KC_8,    KC_7, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, _______, XXXXXXX,
+   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+       XXXXXXX, XXXXXXX,    KC_3,    KC_2,    KC_1, XXXXXXX,                      XXXXXXX, KC_RSFT, KC_RGUI, _______, KC_RCTL, XXXXXXX,
+   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+       XXXXXXX, XXXXXXX,    KC_6,    KC_5,    KC_4, XXXXXXX,                      XXXXXXX, XXXXXXX, _______, _______, _______, XXXXXXX,
+   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+                                                       KC_0, _______,    _______, _______
+                                                 //`----------------'  `------------------'
+   ),
   [NAV] = LAYOUT(
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_HOME, KC_PGDN, KC_PGUP,  KC_END, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_LCTL, KC_LALT, KC_LGUI, KC_LSFT, XXXXXXX,                      KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,  KC_TAB, XXXXXXX,
+       XXXXXXX, KC_LCTL, _______, KC_LGUI, KC_LSFT, XXXXXXX,                      KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,  KC_TAB, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     LEFT_TAB, KC_BSPC, CW_TOGG,RGHT_TAB,  SW_WIN, XXXXXXX,
+       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     LEFT_TAB,  KC_TAB, CW_TOGG,RGHT_TAB,  SW_WIN, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     _______, _______,    _______, _______
                                                  //`----------------'  `------------------'
    ),
-  // SYM_L and SYM_R must stay byte-for-byte identical: to the hands they are
-  // one "Sym". Left `!` is kept (not `:`) so that the ! -> = inroll types `!=`.
-  [SYM_L] = LAYOUT(
+  [LSYM] = LAYOUT(
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX,   KC_AT, KC_LABK, KC_RABK, KC_MINS, KC_PIPE,                      KC_CIRC, KC_RCBR, KC_LCBR,  KC_DLR,  KC_GRV, XXXXXXX,
+       XXXXXXX,   KC_AT, KC_LABK, KC_RABK, KC_MINS, KC_PIPE,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_EXLM, KC_ASTR, KC_SLSH,  KC_EQL, KC_AMPR,                      KC_HASH, KC_RPRN, KC_LPRN,  ARROWS, KC_SCLN, XXXXXXX,
+       XXXXXXX, KC_EXLM, KC_ASTR, KC_SLSH,  KC_EQL, KC_AMPR,                      XXXXXXX, KC_RSFT, KC_RGUI, _______, KC_RCTL, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_TILD, KC_PLUS, KC_LBRC, KC_RBRC, KC_PERC,                      KC_BSLS, KC_COLN, KC_DQUO, KC_UNDS, KC_QUES, XXXXXXX,
+       XXXXXXX, KC_TILD, KC_PLUS, KC_LBRC, KC_RBRC, KC_PERC,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_LALT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     _______, _______,    _______, _______
                                                  //`----------------'  `------------------'
    ),
-  [SYM_R] = LAYOUT(
+  [RSYM] = LAYOUT(
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX,   KC_AT, KC_LABK, KC_RABK, KC_MINS, KC_PIPE,                      KC_CIRC, KC_RCBR, KC_LCBR,  KC_DLR,  KC_GRV, XXXXXXX,
+       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_CIRC, KC_RCBR, KC_LCBR,  KC_DLR,  KC_GRV, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_EXLM, KC_ASTR, KC_SLSH,  KC_EQL, KC_AMPR,                      KC_HASH, KC_RPRN, KC_LPRN,  ARROWS, KC_SCLN, XXXXXXX,
+       XXXXXXX, KC_LCTL, _______, KC_LGUI, KC_LSFT, XXXXXXX,                      KC_HASH, KC_RPRN, KC_LPRN,  ARROWS, KC_SCLN, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_TILD, KC_PLUS, KC_LBRC, KC_RBRC, KC_PERC,                      KC_BSLS, KC_COLN, KC_DQUO, KC_UNDS, KC_QUES, XXXXXXX,
-   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                                    _______, _______,    _______, _______
-                                                 //`----------------'  `------------------'
-   ),
-  // Reached by holding BOTH Sym thumbs (tri-layer). Only the right half is
-  // overridden; the transparent left half falls through to the Sym layer
-  // underneath, so `[`, `]`, `(`, `-` stay available while typing digits.
-  // NumWord uses this layer on its own, where the left half falls to BASE.
-  [NUM] = LAYOUT(
-   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
-   //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, _______, _______, _______, _______, _______,                      KC_SLSH,    KC_7,    KC_8,    KC_9, KC_ASTR, XXXXXXX,
-   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, _______, _______, _______, _______, _______,                      KC_PLUS,    KC_4,    KC_5,    KC_6, KC_MINS, XXXXXXX,
-   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, _______, _______, _______, _______, _______,                         KC_0,    KC_1,    KC_2,    KC_3,  KC_DOT, XXXXXXX,
+       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_BSLS, KC_COLN, KC_DQUO, KC_UNDS, KC_QUES, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     _______, _______,    _______, _______
                                                  //`----------------'  `------------------'
@@ -142,76 +126,78 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, QK_BOOT, XXXXXXX, KC_BRID, KC_BRIU, XXXXXXX,                       KC_F12,   KC_F7,   KC_F8,   KC_F9, XXXXXXX, XXXXXXX,
+       XXXXXXX, QK_BOOT, XXXXXXX, KC_BRID, KC_BRIU, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, SW_LANG, KC_MUTE, KC_VOLD, KC_VOLU, KC_MPLY,                       KC_F11,   KC_F4,   KC_F5,   KC_F6, XXXXXXX, XXXXXXX,
+       XXXXXXX, SW_LANG, KC_MUTE, KC_VOLD, KC_VOLU, KC_MPLY,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, RM_TOGG, RM_NEXT, RM_VALD, RM_VALU, XXXXXXX,                       KC_F10,   KC_F1,   KC_F2,   KC_F3, XXXXXXX, XXXXXXX,
+       XXXXXXX, RM_TOGG, RM_NEXT, RM_VALD, RM_VALU, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX
                                                  //`----------------'  `------------------'
    ),
 };
 
-// -----------------------------------------------------------------------------
-// Combos: intentionally rare conveniences, not architecture.
-// X+M toggles NumWord. Quote+underscore retains the original held META combo.
-// -----------------------------------------------------------------------------
-enum combo_events {
-    C_NUMWORD,
-    C_META,
-};
+// SWAPPERS booleans
+bool sw_win_active = false;
+bool sw_lang_active = false;
 
-const uint16_t PROGMEM numword_combo[]  = {KC_X, KC_M, COMBO_END};
-const uint16_t PROGMEM meta_combo[]     = {KC_QUOT, KC_UNDS, COMBO_END};
+// COMBOS
+const uint16_t capsword[] PROGMEM = {KC_M, KC_QUOT, COMBO_END};
+const uint16_t meta[] PROGMEM = {KC_QUOT, KC_UNDS, COMBO_END};
 
 combo_t key_combos[] = {
-    [C_NUMWORD]  = COMBO(numword_combo, NW_TOGG),
-    [C_META]     = COMBO(meta_combo, MO(META)),
+    COMBO(capsword, CW_TOGG),
+    COMBO(meta, MO(META))
 };
 
-
-
-// -----------------------------------------------------------------------------
-// Custom Shift keys
-// -----------------------------------------------------------------------------
+// CUSTOM SHIFT
 const custom_shift_key_t custom_shift_keys[] = {
-    {KC_DOT,  KC_QUES},
+    {KC_DOT, KC_QUES},
+    {HRM_DOT, KC_QUES},
+
     {KC_COMM, KC_EXLM},
     {KC_UNDS, KC_AT},
+
     {KC_BSPC, KC_DEL},
+    {HRM_BSP, KC_DEL},
+
+    {KC_SLSH, KC_BSLS},
 };
 
+// TAP-HOLD POLICY
 uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        // Do not let a previous tap force the next intended layer/Shift hold
-        // back into another tap. This is particularly important in Vim.
-        case TH_LSYM:
-        case TH_RSYM:
-        case MGIC_SFT:
+        // Do not let a previous tap force the next intended layer/mod hold back
+        // into another tap. This is particularly important in Vim, and for the
+        // home-row symbol keys: tapping `e`, then immediately holding `e` for
+        // LSYM, must open the layer rather than repeat the letter.
+        case HRM_R:
+        case HRM_E:
+        case HRM_ESC:
+        case HRM_ENT:
+        case HRM_BSP:
             return 0;
-        case TH_SPC:
+        case HRM_SPC:
             return 125;
         default:
             return QUICK_TAP_TERM;
     }
 }
 
-
 bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        // The right Sym thumb and the dedicated thumb Shift need to engage on
-        // key-down, with no perceptible wait for the other key to be released.
-        case TH_RSYM:
-        case MGIC_SFT:
+        // The dedicated thumb Shift needs to engage on key-down, with no
+        // perceptible wait for the other key to be released.
+        case HRM_ENT:
             return true;
 
-        // Esc/SymL deliberately stays permissive-only: Esc-down, j-down,
-        // Esc-up, j-up is still Escape+j rather than Sym+j. Global
-        // PERMISSIVE_HOLD still settles it as a hold on a nested press/release,
-        // so right-hand symbols through the left thumb stay responsive.
-        case TH_LSYM:
-        case TH_SPC:
+        // Everything else stays permissive-only. HRM_R and HRM_E in particular
+        // must never settle on another key's *press*: they are home-row letters
+        // typed constantly, and `re` would become RSYM + e. They rely on
+        // Chordal Hold plus PERMISSIVE_HOLD instead.
+        // Esc/Alt and Bspc/Num are the same story with their tap actions:
+        // Esc-down, j-down, Esc-up, j-up stays Escape+j, and a Backspace
+        // corrected mid-word does not open NUM.
         default:
             return false;
     }
@@ -228,7 +214,9 @@ static bool flow_prev_is_typing_key(uint16_t keycode) {
 
 uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record,
                            uint16_t prev_keycode) {
-    // Flow Tap is BASE-HRM-only. Never let it touch Sym/Num/Nav thumbs.
+    // Flow Tap is BASE-mod-HRM-only. It deliberately excludes HRM_R and HRM_E:
+    // symbols follow letters constantly (`foo->bar`), so suppressing those
+    // holds mid-flow would be exactly wrong. The thumbs are excluded too.
     if (get_highest_layer(layer_state) != BASE || !flow_prev_is_typing_key(prev_keycode)) {
         return 0;
     }
@@ -244,8 +232,8 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record,
         case HRM_N:
         case HRM_I:
             return 60;
-        case HRM_R:
-        case HRM_E:
+        case HRM_Z:
+        case HRM_DOT:
             return 75;
         case HRM_T:
         case HRM_A:
@@ -259,153 +247,64 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record,
 }
 #endif
 
-// -----------------------------------------------------------------------------
-// Caps Word.
-// -----------------------------------------------------------------------------
 bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
         case KC_A ... KC_Z:
             add_weak_mods(MOD_BIT(KC_LSFT));
             return true;
+
         case KC_MINS:
         case KC_1 ... KC_0:
         case KC_BSPC:
         case KC_DEL:
         case KC_UNDS:
             return true;
+
         default:
             return false;
     }
 }
-
-// -----------------------------------------------------------------------------
-// NumWord: a lightweight QMK auto-NUM layer.
-// Holding both Sym thumbs remains the preferred path for Vim counts, because
-// releasing them is unambiguous; NumWord is a convenience for long runs such
-// as 192.168.42.123. The transparent NUM left half falls through to Base and
-// terminates NumWord when its Base key isn't in the continue list.
-// -----------------------------------------------------------------------------
-#define NUM_WORD_IDLE_TIMEOUT 5000
-static bool num_word_active = false;
-static uint32_t num_word_timer = 0;
-
-static void num_word_on(void) {
-    num_word_active = true;
-    num_word_timer  = timer_read32();
-    layer_on(NUM);
-}
-
-static void num_word_off(void) {
-    num_word_active = false;
-    layer_off(NUM);
-}
-
-static bool num_word_continue(uint16_t keycode) {
-    switch (keycode) {
-        case KC_1 ... KC_0:
-        case KC_DOT:
-        case KC_COMM:
-        case KC_MINS:
-        case KC_PLUS:
-        case KC_ASTR:
-        case KC_SLSH:
-        case KC_EQL:
-        case KC_BSPC:
-        case KC_DEL:
-            return true;
-        default:
-            return false;
-    }
-}
-
-void housekeeping_task_user(void) {
-    if (num_word_active && timer_elapsed32(num_word_timer) > NUM_WORD_IDLE_TIMEOUT) {
-        num_word_off();
-    }
-}
-
-// -----------------------------------------------------------------------------
-// Tri-layer: SymL + SymR -> NUM.
-// NumWord owns NUM outright while it is active, so the tri-layer rule is
-// skipped there; otherwise update_tri_layer_state() would immediately clear the
-// layer NumWord just turned on.
-// -----------------------------------------------------------------------------
-layer_state_t layer_state_set_user(layer_state_t state) {
-    if (num_word_active) {
-        return state;
-    }
-    return update_tri_layer_state(state, SYM_L, SYM_R, NUM);
-}
-
-
-
-// -----------------------------------------------------------------------------
-// SWAPPERS booleans.
-// -----------------------------------------------------------------------------
-bool sw_win_active  = false;
-bool sw_lang_active = false;
 
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    update_swapper(&sw_win_active, MOD_MASK_GUI, KC_TAB, SW_WIN, keycode, record);
-    update_swapper(&sw_lang_active, MOD_MASK_CTRL | MOD_MASK_ALT, KC_SPC,
-                   SW_LANG, keycode, record);
+#ifdef CONSOLE_ENABLE
+    // If you use combos, you can special-case them; otherwise keep it simple:
+    uint8_t row = record->event.key.row;
+    uint8_t col = record->event.key.col;
 
-    // NumWord first, so a terminating transparent Base key disables NUM before
-    // it is sent. Pressing the NumWord combo again toggles it off.
-    if (keycode == NW_TOGG) {
-        if (record->event.pressed) {
-            if (num_word_active) {
-                num_word_off();
-            } else {
-                num_word_on();
-            }
-        }
-        return false;
-    }
-    if (num_word_active && record->event.pressed) {
-        if (num_word_continue(keycode)) {
-            num_word_timer = timer_read32();
-        } else {
-            num_word_off();
-        }
-    }
+    uprintf("0x%04X,%u,%u,%u,%u,0x%02X,0x%02X,%u\n",
+            keycode,                             // 0x#### (hex keycode)
+            row,                                 // row
+            col,                                 // col
+            get_highest_layer(layer_state),      // layer
+            record->event.pressed ? 1 : 0,       // pressed (0/1)  <-- was %b
+            (unsigned)get_mods(),                // current mods (hex)
+            (unsigned)get_oneshot_mods(),        // oneshot mods (hex)
+            record->tap.count);                  // tap count
+#endif
+    update_swapper(
+        &sw_win_active, MOD_MASK_GUI, KC_TAB, SW_WIN,
+        keycode, record
+    );
+    update_swapper(
+        &sw_lang_active, MOD_MASK_CTRL | MOD_MASK_ALT, KC_SPC, SW_LANG,
+        keycode, record
+    );
 
     switch (keycode) {
-        case MGIC_SFT:
-            if (record->tap.count > 0) {
-                if (record->event.pressed) {
-                    const uint8_t shifts = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
-
-                    if (shifts) {
-                        // A prior Magic tap leaves one-shot Shift active, so a
-                        // second tap naturally becomes Caps Word.
-                        del_oneshot_mods(MOD_MASK_SHIFT);
-                        caps_word_on();
-                    } else {
-                        add_oneshot_mods(MOD_BIT(KC_LSFT));
-                    }
-                }
-                return false;
-            }
-            // tap.count == 0: let the LSFT mod-tap hold behavior run normally.
-            break;
         case ARROWS:
             if (record->event.pressed) {
-                const uint8_t saved_mods = get_mods();
-                const uint8_t saved_osm  = get_oneshot_mods();
-                const bool shifted = ((saved_mods | saved_osm) & MOD_MASK_SHIFT) != 0;
-
-                if (shifted) {
+                if (get_mods() & MOD_MASK_SHIFT) {
+                    uint8_t saved_mods = get_mods();
                     del_mods(MOD_MASK_SHIFT);
-                    set_oneshot_mods(saved_osm & ~MOD_MASK_SHIFT);
                     SEND_STRING("=> ");
                     set_mods(saved_mods);
                 } else {
                     SEND_STRING("-> ");
                 }
+                return false;
             }
-            return false;
+            break;
     }
 
     return true;
