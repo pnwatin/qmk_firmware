@@ -12,11 +12,9 @@ enum layers {
 
 enum custom_keycodes {
   SW_WIN = SAFE_RANGE,
-  SW_LANG,
   ARROWS,
 };
 
-// HOMEROW
 #define HRM_N LCTL_T(KC_N)
 #define HRM_R LT(RSYM, KC_R)
 #define HRM_T LGUI_T(KC_T)
@@ -30,24 +28,23 @@ enum custom_keycodes {
 #define HRM_Z LALT_T(KC_Z)
 #define HRM_DOT LALT_T(KC_DOT)
 
-// THUMBROW
 #define HRM_SPC LT(NAV, KC_SPC)
 #define HRM_ESC RALT_T(KC_ESC)
-#define HRM_ENT RSFT_T(KC_ENT)
-#define HRM_BSP LT(NUM, KC_BSPC)
+#define HRM_ENT LT(NUM, KC_ENT)
+#define MGIC_SFT LSFT_T(KC_NO)
 
-// TABS
 #define RGHT_TAB C(KC_TAB)
 #define LEFT_TAB C(S(KC_TAB))
 #define SFT_TAB S(KC_TAB)
 
-// CHORDAL HOLD
-// Explicit handedness removes any dependency on QMK guessing the Voyager matrix
-// geometry. Thumbs are '*', which is what the old get_chordal_hold() override
-// did by hand: Chordal Hold does not constrain them.
-// This is the main guard for HRM_R/HRM_E: LSYM/RSYM live on the opposite hand,
-// so a same-hand roll off `r` or `e` is forced to a tap and can never open a
-// symbol layer mid-word.
+const custom_shift_key_t custom_shift_keys[] = {
+    {KC_DOT, KC_QUES},
+    {HRM_DOT, KC_QUES},
+    {KC_COMM, KC_EXLM},
+    {KC_UNDS, KC_AT},
+    {KC_BSPC, KC_DEL},
+};
+
 const char chordal_hold_layout[MATRIX_ROWS][MATRIX_COLS] PROGMEM = LAYOUT(
     'L','L','L','L','L','L',                         'R','R','R','R','R','R',
     'L','L','L','L','L','L',                         'R','R','R','R','R','R',
@@ -67,7 +64,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX,   HRM_Z,    KC_X,    KC_M,    KC_C,    KC_V,                         KC_K,    KC_P, KC_QUOT, KC_UNDS, HRM_DOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                                    HRM_SPC, HRM_ESC,    HRM_ENT, HRM_BSP
+                                                    HRM_SPC, HRM_ESC,    HRM_ENT, MGIC_SFT
                                                  //`----------------'  `------------------'
   ),
   [NUM] = LAYOUT(
@@ -91,7 +88,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX, KC_LCTL, _______, KC_LGUI, KC_LSFT, XXXXXXX,                      KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,  KC_TAB, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     LEFT_TAB,  KC_TAB, CW_TOGG,RGHT_TAB,  SW_WIN, XXXXXXX,
+       XXXXXXX, KC_LALT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     LEFT_TAB, KC_BSPC, CW_TOGG,RGHT_TAB,  SW_WIN, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     _______, _______,    _______, _______
                                                  //`----------------'  `------------------'
@@ -128,7 +125,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
        XXXXXXX, QK_BOOT, XXXXXXX, KC_BRID, KC_BRIU, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, SW_LANG, KC_MUTE, KC_VOLD, KC_VOLU, KC_MPLY,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+       XXXXXXX, XXXXXXX, KC_MUTE, KC_VOLD, KC_VOLU, KC_MPLY,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+                    |--------+--------|--------+--------|--------+--------|
        XXXXXXX, RM_TOGG, RM_NEXT, RM_VALD, RM_VALU, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
@@ -137,48 +134,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    ),
 };
 
-// SWAPPERS booleans
-bool sw_win_active = false;
-bool sw_lang_active = false;
 
-// COMBOS
-const uint16_t capsword[] PROGMEM = {KC_M, KC_QUOT, COMBO_END};
+bool sw_win_active = false;
+
+
 const uint16_t meta[] PROGMEM = {KC_QUOT, KC_UNDS, COMBO_END};
 
 combo_t key_combos[] = {
-    COMBO(capsword, CW_TOGG),
     COMBO(meta, MO(META))
 };
 
-// CUSTOM SHIFT
-const custom_shift_key_t custom_shift_keys[] = {
-    {KC_DOT, KC_QUES},
-    {HRM_DOT, KC_QUES},
-
-    {KC_COMM, KC_EXLM},
-    {KC_UNDS, KC_AT},
-
-    {KC_BSPC, KC_DEL},
-    {HRM_BSP, KC_DEL},
-
-    {KC_SLSH, KC_BSLS},
-};
-
-// TAP-HOLD POLICY
+// Only the home-row symbol keys opt out. Tapping `e` and then immediately
+// holding `e` for LSYM must open the layer, not repeat the letter -- `value =`
+// is exactly that sequence. Everything else keeps the global window, which is
+// what lets a tap-then-hold on Space repeat spaces instead of opening NAV, and
+// what makes a second Magic tap land on Caps Word.
 uint16_t get_quick_tap_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        // Do not let a previous tap force the next intended layer/mod hold back
-        // into another tap. This is particularly important in Vim, and for the
-        // home-row symbol keys: tapping `e`, then immediately holding `e` for
-        // LSYM, must open the layer rather than repeat the letter.
         case HRM_R:
         case HRM_E:
-        case HRM_ESC:
-        case HRM_ENT:
-        case HRM_BSP:
             return 0;
-        case HRM_SPC:
-            return 125;
         default:
             return QUICK_TAP_TERM;
     }
@@ -188,20 +163,17 @@ bool get_hold_on_other_key_press(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         // The dedicated thumb Shift needs to engage on key-down, with no
         // perceptible wait for the other key to be released.
-        case HRM_ENT:
+        case MGIC_SFT:
             return true;
 
-        // Everything else stays permissive-only. HRM_R and HRM_E in particular
-        // must never settle on another key's *press*: they are home-row letters
-        // typed constantly, and `re` would become RSYM + e. They rely on
-        // Chordal Hold plus PERMISSIVE_HOLD instead.
-        // Esc/Alt and Bspc/Num are the same story with their tap actions:
-        // Esc-down, j-down, Esc-up, j-up stays Escape+j, and a Backspace
-        // corrected mid-word does not open NUM.
+        // Everything else stays permissive-only. HRM_ENT in particular must
+        // not settle on another key's press: Enter, then typing straight into
+        // the new line, would otherwise roll into NUM + that key.
         default:
             return false;
     }
 }
+
 
 #ifdef FLOW_TAP_TERM
 static bool flow_prev_is_typing_key(uint16_t keycode) {
@@ -226,26 +198,27 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record,
         return 0;
     }
 
-    // Deliberately much shorter than QMK's generic 150 ms starting point.
-    // Ctrl is the most Vim-sensitive; Shift gets the strongest typing guard.
+    // One shared term for every mod HRM, deliberately shorter than QMK's
+    // generic 150 ms starting point. If a single finger ever feels wrong, split
+    // it out of this list and give it its own value: lower means the mod
+    // becomes available sooner after a keystroke (better for Vim Ctrl chords),
+    // higher means a stronger guard against an accidental mod mid-roll.
     switch (keycode) {
         case HRM_N:
-        case HRM_I:
-            return 60;
-        case HRM_Z:
-        case HRM_DOT:
-            return 75;
         case HRM_T:
-        case HRM_A:
-            return 90;
         case HRM_S:
+        case HRM_Z:
         case HRM_H:
-            return 105;
+        case HRM_A:
+        case HRM_I:
+        case HRM_DOT:
+            return FLOW_TAP_TERM;
         default:
             return 0;
     }
 }
 #endif
+
 
 bool caps_word_press_user(uint16_t keycode) {
     switch (keycode) {
@@ -266,37 +239,48 @@ bool caps_word_press_user(uint16_t keycode) {
 }
 
 
+// Magic Shift is Shift with a smarter tap:
+//   hold                   -> normal Shift
+//   tap                    -> sticky/one-shot Shift (ONESHOT_TIMEOUT)
+//   tap while Shift active -> Caps Word
+// MGIC_SFT is an ordinary LSFT mod-tap with KC_NO as its tap payload, so QMK
+// handles the hold side and only the tap side is replaced here.
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-#ifdef CONSOLE_ENABLE
-    // If you use combos, you can special-case them; otherwise keep it simple:
-    uint8_t row = record->event.key.row;
-    uint8_t col = record->event.key.col;
-
-    uprintf("0x%04X,%u,%u,%u,%u,0x%02X,0x%02X,%u\n",
-            keycode,                             // 0x#### (hex keycode)
-            row,                                 // row
-            col,                                 // col
-            get_highest_layer(layer_state),      // layer
-            record->event.pressed ? 1 : 0,       // pressed (0/1)  <-- was %b
-            (unsigned)get_mods(),                // current mods (hex)
-            (unsigned)get_oneshot_mods(),        // oneshot mods (hex)
-            record->tap.count);                  // tap count
-#endif
     update_swapper(
         &sw_win_active, MOD_MASK_GUI, KC_TAB, SW_WIN,
         keycode, record
     );
-    update_swapper(
-        &sw_lang_active, MOD_MASK_CTRL | MOD_MASK_ALT, KC_SPC, SW_LANG,
-        keycode, record
-    );
 
     switch (keycode) {
+        case MGIC_SFT:
+            if (record->tap.count > 0) {
+                if (record->event.pressed) {
+                    const uint8_t shifts = (get_mods() | get_oneshot_mods()) & MOD_MASK_SHIFT;
+
+                    if (shifts) {
+                        // A prior Magic tap leaves one-shot Shift active, so a
+                        // second tap naturally becomes Caps Word.
+                        del_oneshot_mods(MOD_MASK_SHIFT);
+                        caps_word_on();
+                    } else {
+                        add_oneshot_mods(MOD_BIT(KC_LSFT));
+                    }
+                }
+                return false;
+            }
+            // tap.count == 0: let the LSFT mod-tap hold behavior run normally.
+            break;
+
         case ARROWS:
             if (record->event.pressed) {
-                if (get_mods() & MOD_MASK_SHIFT) {
-                    uint8_t saved_mods = get_mods();
+                // One-shot Shift lives outside get_mods(), so both have to be
+                // consulted and both cleared before sending the literal.
+                const uint8_t saved_mods = get_mods();
+                const uint8_t saved_osm  = get_oneshot_mods();
+
+                if ((saved_mods | saved_osm) & MOD_MASK_SHIFT) {
                     del_mods(MOD_MASK_SHIFT);
+                    set_oneshot_mods(saved_osm & ~MOD_MASK_SHIFT);
                     SEND_STRING("=> ");
                     set_mods(saved_mods);
                 } else {
