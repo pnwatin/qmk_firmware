@@ -1,6 +1,12 @@
 #include QMK_KEYBOARD_H
 #include "features/swapper.h"
 
+#if __has_include("secrets.h")
+#    include "secrets.h"
+#else
+#    include "secrets.example.h"
+#endif
+
 enum layers {
   BASE,
   NUM,
@@ -13,6 +19,9 @@ enum layers {
 enum custom_keycodes {
   SW_WIN = SAFE_RANGE,
   ARROWS,
+  EMAIL1,
+  EMAIL2,
+  EMAIL3,
 };
 
 #define HRM_N LCTL_T(KC_N)
@@ -123,11 +132,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, QK_BOOT, XXXXXXX, KC_BRID, KC_BRIU, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+       XXXXXXX, QK_BOOT, KC_MPLY, KC_BRID, KC_BRIU,  EMAIL1,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, XXXXXXX, KC_MUTE, KC_VOLD, KC_VOLU, KC_MPLY,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+       XXXXXXX, XXXXXXX, KC_MUTE, KC_VOLD, KC_VOLU,  EMAIL2,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX, RM_TOGG, RM_NEXT, RM_VALD, RM_VALU, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+       XXXXXXX, RM_TOGG, RM_NEXT, RM_VALD, RM_VALU,  EMAIL3,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX
                                                  //`----------------'  `------------------'
@@ -252,6 +261,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     );
 
     switch (keycode) {
+        case EMAIL1:
+            if (record->event.pressed) {
+                SEND_STRING(EMAIL1_STR);
+            }
+            return false;
+
+        case EMAIL2:
+            if (record->event.pressed) {
+                SEND_STRING(EMAIL2_STR);
+            }
+            return false;
+
+        case EMAIL3:
+            if (record->event.pressed) {
+                SEND_STRING(EMAIL3_STR);
+            }
+            return false;
+
         case MGIC_SFT:
             if (record->tap.count > 0) {
                 if (record->event.pressed) {
