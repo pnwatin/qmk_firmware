@@ -25,7 +25,7 @@ enum custom_keycodes {
 #define HRM_E LT(LSYM, KC_E)
 #define HRM_I RCTL_T(KC_I)
 
-#define HRM_Z LALT_T(KC_Z)
+#define HRM_Q LALT_T(KC_Q)
 #define HRM_DOT LALT_T(KC_DOT)
 
 #define HRM_SPC LT(NAV, KC_SPC)
@@ -58,11 +58,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------|--------+--------|--------+--------|
-       XXXXXXX,    KC_Q,    KC_L,    KC_D,    KC_W,    KC_B,                         KC_J,    KC_F,    KC_O,    KC_U, KC_COMM, XXXXXXX,
+       XXXXXXX,    KC_B,    KC_L,    KC_D,    KC_C,    KC_V,                         KC_J,    KC_Y,    KC_O,    KC_U, KC_COMM, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_Y,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
+       XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_P,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,   HRM_Z,    KC_X,    KC_M,    KC_C,    KC_V,                         KC_K,    KC_P, KC_QUOT, KC_UNDS, HRM_DOT, XXXXXXX,
+       XXXXXXX,   HRM_Q,    KC_X,    KC_M,    KC_W,    KC_Z,                         KC_K,    KC_F, KC_QUOT, KC_SCLN, HRM_DOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     HRM_SPC, HRM_ESC,    HRM_ENT, MGIC_SFT
                                                  //`----------------'  `------------------'
@@ -138,7 +138,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 bool sw_win_active = false;
 
 
-const uint16_t meta[] PROGMEM = {KC_QUOT, KC_UNDS, COMBO_END};
+const uint16_t meta[] PROGMEM = {KC_QUOT, KC_SCLN, COMBO_END};
 
 combo_t key_combos[] = {
     COMBO(meta, MO(META))
@@ -207,7 +207,7 @@ uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t *record,
         case HRM_N:
         case HRM_T:
         case HRM_S:
-        case HRM_Z:
+        case HRM_Q:
         case HRM_H:
         case HRM_A:
         case HRM_I:
