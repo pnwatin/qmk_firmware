@@ -19,6 +19,7 @@ enum layers {
 enum custom_keycodes {
   SW_WIN = SAFE_RANGE,
   ARROWS,
+  TAP_TILD,
   EMAIL1,
   EMAIL2,
   EMAIL3,
@@ -71,7 +72,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX,   HRM_N,   HRM_R,   HRM_T,   HRM_S,    KC_G,                         KC_P,   HRM_H,   HRM_A,   HRM_E,   HRM_I, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX,   HRM_Q,    KC_X,    KC_M,    KC_W,    KC_Z,                         KC_K,    KC_F, KC_QUOT, KC_SCLN, HRM_DOT, XXXXXXX,
+       XXXXXXX,   HRM_Q,    KC_X,    KC_M,    KC_W,    KC_Z,                         KC_K,    KC_F, KC_QUOT, KC_UNDS, HRM_DOT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     HRM_SPC, HRM_ESC,    HRM_ENT, MGIC_SFT
                                                  //`----------------'  `------------------'
@@ -110,7 +111,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        XXXXXXX, KC_EXLM, KC_ASTR, KC_SLSH,  KC_EQL, KC_AMPR,                      XXXXXXX, KC_RSFT, KC_RGUI, _______, KC_RCTL, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       XXXXXXX, KC_TILD, KC_PLUS, KC_LBRC, KC_RBRC, KC_PERC,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_LALT, XXXXXXX,
+       XXXXXXX, TAP_TILD, KC_PLUS, KC_LBRC, KC_RBRC, KC_PERC,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_LALT, XXXXXXX,
    //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                                     _______, _______,    _______, _______
                                                  //`----------------'  `------------------'
@@ -147,7 +148,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 bool sw_win_active = false;
 
 
-const uint16_t meta[] PROGMEM = {KC_QUOT, KC_SCLN, COMBO_END};
+
+const uint16_t meta[] PROGMEM = {KC_QUOT, KC_UNDS, COMBO_END};
 
 combo_t key_combos[] = {
     COMBO(meta, MO(META))
@@ -261,6 +263,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     );
 
     switch (keycode) {
+        case TAP_TILD:
+            if (record->event.pressed) {
+                // KC_TILD normally holds synthetic Shift until key-up. Emit the
+                // whole chord now so a rolled slash does not become question mark.
+                tap_code16(KC_TILD);
+            }
+            return false;
+
         case EMAIL1:
             if (record->event.pressed) {
                 SEND_STRING(EMAIL1_STR);
